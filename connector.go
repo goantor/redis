@@ -25,10 +25,21 @@ func (m connector) Connect() (db *redis.Client) {
 		panic(err)
 	}
 
+	m.mergeOption(opt)
+
 	db = redis.NewClient(opt)
 	if err = db.Ping(context.Background()).Err(); err != nil {
 		panic(err)
 	}
 
 	return
+}
+
+func (m connector) mergeOption(opt *redis.Options) {
+	opt.PoolSize = m.opt.TakePoolSize()
+	opt.MinIdleConns = m.opt.TakeMinIdleConns()
+	opt.MaxConnAge = m.opt.TakeMaxConnAge()
+	opt.PoolTimeout = m.opt.TakePoolTimeout()
+	opt.IdleTimeout = m.opt.TakeIdleTimeout()
+	opt.IdleCheckFrequency = m.opt.TakeIdleCheckFrequency()
 }
